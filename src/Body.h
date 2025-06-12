@@ -7,15 +7,11 @@ public:
     Vec2 velocity;
     float radius;
     float mass;
-    float restitution;  // Bounciness (0 = no bounce, 1 = perfect)
+    float restitution;
     bool isStatic;
 
-    // Constructor
     Body(Vec2 pos, float r, float m, float rest, bool stat = false);
-
-    // Apply a force-like impulse to the velocity
-    void ApplyImpulse(const Vec2& impulse);
-
-    // Update position based on current velocity
+    void ApplyImpulse(Vec2 impulse);
     void Update(float dt);
 };
+
