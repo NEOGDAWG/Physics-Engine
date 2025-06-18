@@ -16,6 +16,9 @@ struct Vec2 {
     Vec2& operator -= (const Vec2& rhs) { x -= rhs.x; y -= rhs.y; return *this; }
 
     Vec2 operator-() const { return Vec2(-x, -y); }
+
+    float LengthSquared() const { return x * x + y * y; }
+    float Dot(const Vec2& other) const { return x * other.x + y * other.y; }
 };
 
 // Length (magnitude) of a vector
