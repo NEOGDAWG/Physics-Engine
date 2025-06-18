@@ -2,29 +2,31 @@
 #include "src/Math.h"
 #include "src/Body.h"
 #include "src/Collision.h"
-#include <algorithm>
+#include "src/World.h"
 
 int main() {
-    // Light ball (mass = 1)
-    Body light(Vec2(0, 0), 1.0f, 1.0f, 0.8f, false);
-    light.velocity = Vec2(5, 0); // Moving right
+    World world(Vec2(0, -9.8f)); // gravity down
 
-    // Heavy ball (mass = 5)
-    Body heavy(Vec2(1.5, 0), 1.0f, 5.0f, 0.8f, false);
-    heavy.velocity = Vec2(-1, 0); // Moving left
+    // Create floor (AABB)
+    Body* floor = new Body(Vec2(0, -5), Vec2(10, 1), 1.0f, 0.6f, true);
+    
+    // Create a circle
+    Body* ball = new Body(Vec2(0, 5), 1.0f, 1.0f, 0.6f, false);
+    
+    // Create a box
+    Body* box = new Body(Vec2(2, 3), Vec2(1, 1), 1.0f, 0.6f, false);
 
-    std::cout << "Before Collision:\n";
-    std::cout << "Light velocity: " << light.velocity.x << ", " << light.velocity.y << "\n";
-    std::cout << "Heavy velocity: " << heavy.velocity.x << ", " << heavy.velocity.y << "\n";
+    world.AddBody(floor);
+    world.AddBody(ball);
+    world.AddBody(box);
 
-    // Run collision resolution
-    CheckAndResolveCollision(&light, &heavy);
-
-    std::cout << "\nAfter Collision:\n";
-    std::cout << "Light velocity: " << light.velocity.x << ", " << light.velocity.y << "\n";
-    std::cout << "Heavy velocity: " << heavy.velocity.x << ", " << heavy.velocity.y << "\n";
+    for (int i = 0; i < 120; ++i) {
+        world.Update(0.016f); // 60 fps
+        std::cout << "t=" << i << ":\n"
+                  << "Ball pos = (" << ball->position.x << ", " << ball->position.y << ")\n"
+                  << "Box pos = (" << box->position.x << ", " << box->position.y << ")\n"
+                  << "-------------------\n";
+    }
 
     return 0;
 }
-
-
