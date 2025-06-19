@@ -9,13 +9,16 @@
                 "-fcolor-diagnostics",
                 "-fansi-escape-codes",
                 "-g",
+                "-I/opt/homebrew/opt/sfml/include",
                 "Main.cpp",
                 "src/*.cpp",
                 "-o",
                 "physics_engine",
+                "-L/opt/homebrew/opt/sfml/lib",
                 "-lsfml-graphics",
                 "-lsfml-window",
-                "-lsfml-system"
+                "-lsfml-system",
+                "-std=c++17"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
