@@ -3,7 +3,7 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "C/C++: clang++ build physics engine",
+            "label": "C/C++: clang++ build physics engine (SFML)",
             "command": "/usr/bin/clang++",
             "args": [
                 "-fcolor-diagnostics",
@@ -12,7 +12,10 @@
                 "Main.cpp",
                 "src/*.cpp",
                 "-o",
-                "physics_engine"
+                "physics_engine",
+                "-lsfml-graphics",
+                "-lsfml-window",
+                "-lsfml-system"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -24,7 +27,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "detail": "Task generated for physics engine project."
+            "detail": "Task generated for physics engine project with SFML."
         }
     ]
 }
