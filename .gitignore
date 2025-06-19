@@ -2,3 +2,9 @@
 *.out
 *.exe
 build/
+physics_engine
+*.dSYM
+*.DS_Store
+*.swp
+
+
