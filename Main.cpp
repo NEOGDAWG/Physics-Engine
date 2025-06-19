@@ -3,6 +3,7 @@
 #include "src/Body.h"
 #include "src/Collision.h"
 #include "src/World.h"
+#include <SFML/Graphics.hpp>
 
 int main() {
     World world(Vec2(0, -9.8f)); // gravity down
