@@ -6,5 +6,7 @@ physics_engine
 *.dSYM
 *.DS_Store
 *.swp
+.vscode/
+
 
 

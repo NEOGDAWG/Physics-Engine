@@ -7,11 +7,18 @@
 
 int main()
 {
-    unsigned int width = 650;
-    unsigned int height = 380;
+    unsigned int width = 1300;
+    unsigned int height = 800;
     sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode({width, height}), "Physics Engine");
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
+
+
+    World* world = new World(Vec2(0, 3));
+    Body* body = new Body(Vec2(650, 200), 50, 10, 0.6, false);
+    Body* floor = new Body(Vec2(650, 775), Vec2(1300, 50), 0, 0.9, true);
+    world->AddBody(body);
+    world->AddBody(floor);
+
+    float dt = 1.0f / 60.0f;
     while (window->isOpen()){
         while(auto event = window->pollEvent()){
             if(event->is<sf::Event::Closed>()){
@@ -23,10 +30,24 @@ int main()
                 }
             }
         }
+        world->Update(dt);
         window->clear();
-        window->draw(shape);
+        
+        // Draw the ball
+        sf::CircleShape ball(50.f); // radius of 50
+        ball.setPosition({body->position.x - 50, body->position.y - 50}); // center the circle
+        ball.setFillColor(sf::Color::Red);
+        window->draw(ball);
+        
+        // Draw the floor
+        sf::RectangleShape ground({1300, 50});
+        ground.setPosition({floor->position.x - 1300/2, floor->position.y - 50/2}); // center the rectangle
+        ground.setFillColor(sf::Color::Green);
+        window->draw(ground);
+        
         window->display();
     }
+    //comment
 
     return 0;
 }

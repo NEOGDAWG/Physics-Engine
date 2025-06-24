@@ -59,15 +59,25 @@ bool CheckCircleAABBCollision(const Circle* circle, const Vec2& circlePos,
 
     Vec2 diff = circlePos - closest;
     float distanceSquared = diff.LengthSquared();
+    float distance = std::sqrt(distanceSquared);
 
+    // Check if circle edge touches AABB edge
     if (distanceSquared > circle->radius * circle->radius) {
         return false;
     }
 
-    float distance = std::sqrt(distanceSquared);
+    if (distance == 0.0f) {
+        // Circle center is exactly on the AABB, choose a default normal
+        contact.normal = Vec2(0, 1);
+        contact.penetration = circle->radius;
+        contact.contactPoint = circlePos - contact.normal * circle->radius;
+        return true;
+    }
+    
+    // Normal points from AABB toward circle center
     contact.normal = diff * (1.0f / distance);
     contact.penetration = circle->radius - distance;
-    contact.contactPoint = closest;
+    contact.contactPoint = circlePos - contact.normal * circle->radius; // Contact point on circle's edge
     
     return true;
 }
@@ -89,20 +99,23 @@ void ResolveCollision(Body* a, Body* b, const Contact& contact) {
 
     // Calculate impulse scalar
     float j = -(1.0f + restitution) * velAlongNormal;
-    j /= a->isStatic ? 0 : 1.0f/a->mass;
-    j /= b->isStatic ? 0 : 1.0f/b->mass;
+    float invMassA = a->isStatic ? 0.0f : 1.0f/a->mass;
+    float invMassB = b->isStatic ? 0.0f : 1.0f/b->mass;
+    float invMassSum = invMassA + invMassB;
+    if (invMassSum == 0.0f) return; // Prevent division by zero
+    j /= invMassSum;
 
     // Apply impulse
     Vec2 impulse = contact.normal * j;
     if (!a->isStatic) a->ApplyImpulse(-impulse);
     if (!b->isStatic) b->ApplyImpulse(impulse);
 
-    // Positional correction to prevent sinking
-    const float percent = 0.2f; // penetration recovery percent
-    const float slop = 0.01f;   // penetration allowance
-    Vec2 correction = contact.normal * (std::max(contact.penetration - slop, 0.0f) / 
-        (a->isStatic ? 0 : 1.0f/a->mass + (b->isStatic ? 0 : 1.0f/b->mass))) * percent;
-    
-    if (!a->isStatic) a->position = a->position - correction * (1.0f/a->mass);
-    if (!b->isStatic) b->position = b->position + correction * (1.0f/b->mass);
+    // Revert: position correction direction
+    if (contact.penetration > 0.01f) {
+        if (!a->isStatic && b->isStatic) {
+            a->position = a->position - contact.normal * contact.penetration;
+        } else if (!b->isStatic && a->isStatic) {
+            b->position = b->position + contact.normal * contact.penetration;
+        }
+    }
 }
