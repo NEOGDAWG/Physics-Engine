@@ -62,7 +62,7 @@ bool CheckCircleAABBCollision(const Circle* circle, const Vec2& circlePos,
     float distance = std::sqrt(distanceSquared);
 
     // Check if circle edge touches AABB edge
-    if (distanceSquared > circle->radius * circle->radius) {
+    if (distance > circle->radius) {
         return false;
     }
 
@@ -110,12 +110,41 @@ void ResolveCollision(Body* a, Body* b, const Contact& contact) {
     if (!a->isStatic) a->ApplyImpulse(-impulse);
     if (!b->isStatic) b->ApplyImpulse(impulse);
 
-    // Revert: position correction direction
-    if (contact.penetration > 0.01f) {
+    // Debug print: before correction
+    std::cout << "Before correction:\n";
+    std::cout << "  a->position: (" << a->position.x << ", " << a->position.y << ")\n";
+    std::cout << "  b->position: (" << b->position.x << ", " << b->position.y << ")\n";
+    std::cout << "  contact.normal: (" << contact.normal.x << ", " << contact.normal.y << ")\n";
+    std::cout << "  contact.penetration: " << contact.penetration << "\n";
+
+    // Simple position correction: move out by penetration
+    if (contact.penetration > 0.0f) {
+        Vec2 correction;
         if (!a->isStatic && b->isStatic) {
-            a->position = a->position - contact.normal * contact.penetration;
+            correction = contact.normal * contact.penetration;
+            a->position = a->position - correction;
+            // Clamp: ensure the ball's bottom never goes below the floor's top
+            if (a->shape->GetType() == Shape::Type::Circle && b->shape->GetType() == Shape::Type::AABB) {
+                float ballRadius = static_cast<Circle*>(a->shape)->radius;
+                float floorTop = b->position.y - static_cast<AABB*>(b->shape)->halfSize.y;
+                float ballBottom = a->position.y + ballRadius;
+                if (ballBottom > floorTop) {
+                    a->position.y = floorTop - ballRadius;
+                }
+            }
         } else if (!b->isStatic && a->isStatic) {
-            b->position = b->position + contact.normal * contact.penetration;
+            correction = contact.normal * contact.penetration;
+            b->position = b->position + correction;
+        } else if (!a->isStatic && !b->isStatic) {
+            correction = contact.normal * (contact.penetration * 0.5f);
+            a->position = a->position - correction;
+            b->position = b->position + correction;
         }
+        // Debug print: applied correction
+        std::cout << "  Applied correction: (" << correction.x << ", " << correction.y << ")\n";
     }
+    // Debug print: after correction
+    std::cout << "After correction:\n";
+    std::cout << "  a->position: (" << a->position.x << ", " << a->position.y << ")\n";
+    std::cout << "  b->position: (" << b->position.x << ", " << b->position.y << ")\n";
 }
