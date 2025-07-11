@@ -75,7 +75,7 @@ bool CheckCircleAABBCollision(const Circle* circle, const Vec2& circlePos,
     }
     
     // Normal points from AABB toward circle center
-    contact.normal = diff * (1.0f / distance);
+    contact.normal = -diff * (1.0f / distance);
     contact.penetration = circle->radius - distance;
     contact.contactPoint = circlePos - contact.normal * circle->radius; // Contact point on circle's edge
     
@@ -105,7 +105,7 @@ void ResolveCollision(Body* a, Body* b, const Contact& contact) {
     if (invMassSum == 0.0f) return; // Prevent division by zero
     j /= invMassSum;
 
-    // Apply impulse
+        // Apply impulse
     Vec2 impulse = contact.normal * j;
     if (!a->isStatic) a->ApplyImpulse(-impulse);
     if (!b->isStatic) b->ApplyImpulse(impulse);
