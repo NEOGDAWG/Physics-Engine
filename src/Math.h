@@ -37,6 +37,15 @@ inline float Dot(const Vec2& a, const Vec2& b) {
     return a.x * b.x + a.y * b.y;
 }
 
+inline Vec2 min(const Vec2& a, const Vec2& b) {
+    if(a.x * a.y < b.x * b.y){
+        return a;
+    }
+    else{
+        return b;
+    }
+}
+
 // Clamp a value between min and max
 inline float Clamp(float val, float min, float max) {
     return (val < min) ? min : (val > max) ? max : val;
