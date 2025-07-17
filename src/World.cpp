@@ -78,3 +78,33 @@ void World::CheckAndResolveCollision(Body* a, Body* b) {
         ResolveCollision(a, b, contact);
     }
 }
+
+const std::vector<Body*>& World::GetBodies() const {
+    return bodies;
+}
+
+void World::DrawBody(sf::RenderWindow& window, Body* body, sf::Color color){
+    if(body->shape->GetType() == Shape::Type::Circle){
+        sf::CircleShape ball(static_cast<Circle*>(body->shape)->radius); 
+        ball.setOrigin(sf::Vector2f(static_cast<Circle*>(body->shape)->radius, static_cast<Circle*>(body->shape)->radius)); 
+        ball.setPosition(sf::Vector2f(body->position.x, body->position.y)); 
+        ball.setFillColor(color);
+        window.draw(ball);
+    }
+    else if(body->shape->GetType() == Shape::Type::AABB){
+        sf::RectangleShape rect(sf::Vector2f(static_cast<AABB*>(body->shape)->halfSize.x * 2, static_cast<AABB*>(body->shape)->halfSize.y * 2));
+        rect.setOrigin(sf::Vector2f(static_cast<AABB*>(body->shape)->halfSize.x, static_cast<AABB*>(body->shape)->halfSize.y));
+        rect.setPosition(sf::Vector2f(body->position.x, body->position.y));
+        rect.setFillColor(color);
+        window.draw(rect);
+    }
+
+
+}
+
+void World::removeAllBodies(){
+    for (Body* body : bodies) {
+        delete body;
+    }
+    bodies.clear();
+}
